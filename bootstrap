@@ -11,7 +11,9 @@ OHIA_HOME="$PROJECT_HOME/ohia"
 if [[ $OS == "Darwin" ]]; then
     # Install Homebrew if needed, this should install command line tools with git
     if ! [ "$(command -v brew)" ]; then
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+        echo "Checking sudo..."
+        sudo echo "sudo have been aquired"
+        curl -fsSL "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh" | /bin/bash
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     brew update
@@ -26,14 +28,12 @@ if [[ $OS == "Darwin" ]]; then
         pyenv-virtualenv \
         ruby-install \
         tree \
-        xz \
-
+        xz
 else
     sudo apt-get update
     sudo apt-get -y dist-upgrade
     sudo apt-get install -y 
-        git \
-
+        git
 fi
 
 # Install nvm
@@ -41,20 +41,22 @@ if ! [ -d "$HOME/.nvm/nvm.sh" ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
-# Install jekyll
-if ! [ "$(command -v ruby-install -V)" ]; then
+# Install ruby
+if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then
     ruby-install --update ruby
     source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
     source /opt/homebrew/opt/chruby/share/chruby/auto.sh
     chruby | cut -c 4- > ~/.ruby-version
 fi
+
+# Install jekyll
 if ! [ "$(command -v jekyll -v)" ]; then
     gem update
     gem install bundler jekyll
 fi
 
 # Download ohia files
-if ! [ -d "$OHIA_HOME"]; then
+if ! [ -d "$OHIA_HOME" ]; then
     mkdir -p "$PROJECT_HOME"
     cd "$PROJECT_HOME"
     git clone https://github.com/imotov/ohia.git
@@ -67,17 +69,17 @@ fi
 # Install oh-my-zsh
 if ! [ -d "$HOME/.oh-my-zsh" ]; then
     sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    cd "$HOME/.oh-my-zsh/plugins" && git clone -q https://github.com/zsh-users/zsh-syntax-highlighting.git
+    cp  "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
 fi
 
 if [ $OS = "Darwin" ]; then
     rsync -u "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
     rsync -u "$OHIA_HOME/gitconfig/gitconfig.osx" "$HOME/.gitconfig"
     rsync -ur "$OHIA_HOME/oh-my-zsh/custom/" "$HOME/.oh-my-zsh/custom/"
-    rsync -ur "$OHIA_HOME/oh-my-zsh/themes/" "$HOME/.oh-my-zsh/themes/"
 
 else
     cp -u "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
     cp -u "$OHIA_HOME/gitconfig/gitconfig" "$HOME/.gitconfig"
     cp -ur "$OHIA_HOME/oh-my-zsh/custom/" "$HOME/.oh-my-zsh/custom/"
-    rsync -ur "$OHIA_HOME/oh-my-zsh/themes/" "$HOME/.oh-my-zsh/themes/"
 fi

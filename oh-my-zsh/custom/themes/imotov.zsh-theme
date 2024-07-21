@@ -1,4 +1,4 @@
-local user='%{$fg_bold[magenta]%}%n@%m%{$reset_color%}'
+local user='%{$fg_bold[blue]%}%n@%m%{$reset_color%}'
 local connection=''
 local pwd='%{$fg[green]%}%~%{$reset_color%}'
 local git_branch='$(git_prompt_info)'
@@ -9,6 +9,8 @@ if [[ -v SSH_CONNECTION ]]; then
  else
     connection=""
 fi
+
+PROMPT="${connection}${user}:${pwd}${virtualenv_prompt_info}${git_branch}❯ "
 
 ZSH_THEME_GIT_PROMPT_PREFIX="❮%{$fg[cyan]%}"
 ZSH_THEME_GIT_PROMPT_SUFFIX="%{$reset_color%}"
