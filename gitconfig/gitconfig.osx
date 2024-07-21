@@ -1,0 +1,9 @@
+[user]
+	name = Igor Motov
+	email = igor@motovs.org
+[core]
+	editor = nano
+[credential]
+	helper = osxkeychain
+[color]
+	ui = auto
