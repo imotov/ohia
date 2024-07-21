@@ -2,8 +2,6 @@
 #
 # Usage:
 # % curl -sk https://raw.githubusercontent.com/imotov/ohia/main/bootstrap | zsh
-# Install gradle separately 
-# % brew install gradle
 
 set -e
 OS=$(uname)
@@ -86,3 +84,6 @@ else
     cp -u "$OHIA_HOME/gitconfig/gitconfig" "$HOME/.gitconfig"
     cp -ur "$OHIA_HOME/oh-my-zsh/custom/" "$HOME/.oh-my-zsh/custom/"
 fi
+
+# Install gradle separately since one of its dependencies breaks the script
+brew install gradle
