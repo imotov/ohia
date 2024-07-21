@@ -1,6 +1,7 @@
 #!/bin/zsh
 #
 # Usage:
+# % /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 # % curl -sk https://raw.githubusercontent.com/imotov/ohia/main/bootstrap | zsh
 
 set -e
@@ -9,12 +10,10 @@ PROJECT_HOME="$HOME/Projects/imotov"
 OHIA_HOME="$PROJECT_HOME/ohia"
 
 if [[ $OS == "Darwin" ]]; then
-    # Install Homebrew if needed, this should install command line tools with git
+    # Check if homebrew is installed
     if ! [ "$(command -v brew)" ]; then
         echo "Checking sudo..."
-        sudo echo "sudo have been aquired"
-        curl -fsSL "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh" | /bin/bash
-        eval "$(/opt/homebrew/bin/brew shellenv)"
+        exit 1
     fi
     brew update
     brew install \
