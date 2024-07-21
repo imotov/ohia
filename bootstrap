@@ -1,8 +1,9 @@
 #!/bin/zsh
 #
 # Usage:
-# % /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 # % curl -sk https://raw.githubusercontent.com/imotov/ohia/main/bootstrap | zsh
+# Install gradle separately 
+# % brew install gradle
 
 set -e
 OS=$(uname)
@@ -10,29 +11,32 @@ PROJECT_HOME="$HOME/Projects/imotov"
 OHIA_HOME="$PROJECT_HOME/ohia"
 
 if [[ $OS == "Darwin" ]]; then
-    # Check if homebrew is installed
+    # Install Homebrew if needed, this should install command line tools with git
     if ! [ "$(command -v brew)" ]; then
         echo "Checking sudo..."
-        exit 1
+        sudo echo "sudo have been aquired"
+        curl -fsSL "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh" | /bin/bash
+        eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     brew update
     brew install \
         chruby \
         exiftool \
         gh \
-        gradle \
         jq \
         poetry \
         pyenv \
         pyenv-virtualenv \
         ruby-install \
         tree \
-        xz
+        xz \
+
 else
     sudo apt-get update
     sudo apt-get -y dist-upgrade
     sudo apt-get install -y 
-        git
+        git \
+
 fi
 
 # Install nvm
