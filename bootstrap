@@ -1,7 +1,10 @@
 #!/bin/zsh
 #
 # Usage:
-# % curl -sk https://raw.githubusercontent.com/imotov/ohia/main/bootstrap | zsh
+# % /bin/zsh -c "$(curl -fsSL https://raw.githubusercontent.com/imotov/ohia/main/bootstrap)"
+#
+# Piping into zsh doesn't work due to https://github.com/Homebrew/homebrew-core/issues/141712
+#
 
 set -e
 OS=$(uname)
@@ -13,7 +16,7 @@ if [[ $OS == "Darwin" ]]; then
     if ! [ "$(command -v brew)" ]; then
         echo "Checking sudo..."
         sudo echo "sudo have been aquired"
-        curl -fsSL "https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh" | /bin/bash
+        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     brew update
@@ -21,6 +24,7 @@ if [[ $OS == "Darwin" ]]; then
         chruby \
         exiftool \
         gh \
+        gradle \
         jq \
         poetry \
         pyenv \
@@ -29,6 +33,23 @@ if [[ $OS == "Darwin" ]]; then
         tree \
         xz \
 
+    # Install ruby
+    if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then
+        ruby-install --update ruby
+        source /opt/homebrew/opt/share/chruby/chruby/chruby.sh
+        source /opt/homebrew/opt/share/chruby/chruby/auto.sh
+        chruby | cut -c 4- > "$HOME/.ruby-version"
+        gem update
+        gem install bundler jekyll
+    fi
+
+    # Install jekyll
+    if ! [ "$(command -v jekyll -v)" ]; then
+        source /opt/homebrew/opt/share/chruby/chruby/chruby.sh
+        source /opt/homebrew/opt/share/chruby/chruby/auto.sh
+        gem update
+        gem install bundler jekyll
+    fi
 else
     sudo apt-get update
     sudo apt-get -y dist-upgrade
@@ -40,20 +61,6 @@ fi
 # Install nvm
 if ! [ -d "$HOME/.nvm/nvm.sh" ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-fi
-
-# Install ruby
-if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then
-    ruby-install --update ruby
-    source /opt/homebrew/opt/chruby/share/chruby/chruby.sh
-    source /opt/homebrew/opt/chruby/share/chruby/auto.sh
-    chruby | cut -c 4- > ~/.ruby-version
-fi
-
-# Install jekyll
-if ! [ "$(command -v jekyll -v)" ]; then
-    gem update
-    gem install bundler jekyll
 fi
 
 # Download ohia files
@@ -78,12 +85,8 @@ if [ $OS = "Darwin" ]; then
     rsync -u "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
     rsync -u "$OHIA_HOME/gitconfig/gitconfig.osx" "$HOME/.gitconfig"
     rsync -ur "$OHIA_HOME/oh-my-zsh/custom/" "$HOME/.oh-my-zsh/custom/"
-
 else
     cp -u "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
     cp -u "$OHIA_HOME/gitconfig/gitconfig" "$HOME/.gitconfig"
     cp -ur "$OHIA_HOME/oh-my-zsh/custom/" "$HOME/.oh-my-zsh/custom/"
 fi
-
-# Install gradle separately since one of its dependencies breaks the script
-brew install gradle
