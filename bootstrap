@@ -86,3 +86,5 @@ else
     cp -u "$OHIA_HOME/gitconfig/gitconfig" "$HOME/.gitconfig"
     cp -ur "$OHIA_HOME/oh-my-zsh/custom/" "$HOME/.oh-my-zsh/custom/"
 fi
+
+cd "$OHIA_HOME"
