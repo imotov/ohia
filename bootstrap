@@ -45,8 +45,8 @@ if [[ $OS == "Darwin" ]]; then
 
     # Install jekyll
     if ! [ "$(command -v jekyll -v)" ]; then
-        source /opt/homebrew/opt/share/chruby/chruby/chruby.sh
-        source /opt/homebrew/opt/share/chruby/chruby/auto.sh
+        source /opt/homebrew/share/chruby/chruby.sh
+        source /opt/homebrew/share/chruby/auto.sh
         gem update
         gem install bundler jekyll
     fi
