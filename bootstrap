@@ -36,17 +36,13 @@ if [[ $OS == "Darwin" ]]; then
     # Install ruby
     if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then
         ruby-install --update ruby
-        source /opt/homebrew/opt/share/chruby/chruby/chruby.sh
-        source /opt/homebrew/opt/share/chruby/chruby/auto.sh
+        source /opt/homebrew/share/chruby/chruby.sh
+        source /opt/homebrew/share/chruby/auto.sh
         chruby | cut -c 4- > "$HOME/.ruby-version"
-        gem update
-        gem install bundler jekyll
     fi
 
     # Install jekyll
     if ! [ "$(command -v jekyll -v)" ]; then
-        source /opt/homebrew/share/chruby/chruby.sh
-        source /opt/homebrew/share/chruby/auto.sh
         gem update
         gem install bundler jekyll
     fi
