@@ -19,19 +19,21 @@ if [[ $OS == "Darwin" ]]; then
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
+    MAC_PACKAGES=(
+        chruby
+        exiftool
+        gh
+        gradle
+        jq
+        poetry
+        pyenv
+        pyenv-virtualenv
+        ruby-install
+        tree
+        xz
+    )
     brew update
-    brew install \
-        chruby \
-        exiftool \
-        gh \
-        gradle \
-        jq \
-        poetry \
-        pyenv \
-        pyenv-virtualenv \
-        ruby-install \
-        tree \
-        xz \
+    brew list $MAC_PACKAGES > /dev/null || brew install $MAC_PACKAGES
 
     # Install ruby
     if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then
@@ -55,7 +57,7 @@ else
 fi
 
 # Install nvm
-if ! [ -d "$HOME/.nvm/nvm.sh" ]; then
+if ! [ -s "$HOME/.nvm/nvm.sh" ]; then
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
 fi
 
