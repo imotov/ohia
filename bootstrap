@@ -1,7 +1,10 @@
 #!/bin/bash
 #
-# Usage:
+# Usage on mac:
 # % /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/imotov/ohia/main/bootstrap)"
+#
+# Usage on linux:
+# $ /bin/bash -c "$(wget -O-  https://raw.githubusercontent.com/imotov/ohia/main/bootstrap)"
 #
 # Piping into zsh doesn't work due to https://github.com/Homebrew/homebrew-core/issues/141712
 #
@@ -51,7 +54,7 @@ if [[ $OS == "Darwin" ]]; then
 else
     sudo apt-get update
     sudo apt-get -y dist-upgrade
-    sudo apt-get install -y 
+    sudo apt-get install -y \
         git \
         ca-certificates \
         curl \
