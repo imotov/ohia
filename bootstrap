@@ -101,6 +101,7 @@ if ! [ -d "$HOME/.oh-my-zsh" ]; then
     cp "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
 fi
 
+# Copy configuration files
 if [ $OS = "Darwin" ]; then
     rsync -u "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
     rsync -u "$OHIA_HOME/gitconfig/gitconfig.osx" "$HOME/.gitconfig"

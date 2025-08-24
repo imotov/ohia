@@ -23,11 +23,11 @@ export CASE_SENSITIVE="true"
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # plugins=(git lein osx zsh-syntax-highlighting)
 
-plugins=(git docker-compose gradle macos zsh-syntax-highlighting virtualenv poetry poetry-env)
+plugins=(git docker-compose gradle macos zsh-syntax-highlighting virtualenv poetry poetry-env kubectl)
 
 # Add zsh autocomplition for brew-installed packages
 if type brew &>/dev/null; then
-    PATH="$(brew --prefix)/share/zsh/site-functions:${FPATH}"
+    PATH="$(brew --prefix)/share/zsh/site-functions:${PATH}"
 fi
 
 source $ZSH/oh-my-zsh.sh
