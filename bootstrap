@@ -18,7 +18,7 @@ if [[ $OS == "Darwin" ]]; then
     # Install Homebrew if needed, this should install command line tools with git
     if ! [ "$(command -v brew)" ]; then
         echo "Checking sudo..."
-        sudo echo "sudo have been aquired"
+        sudo echo "sudo have been acquired"
         /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
@@ -26,6 +26,7 @@ if [[ $OS == "Darwin" ]]; then
         chruby
         exiftool
         gh
+        go
         gradle
         jq
         poetry
@@ -50,6 +51,11 @@ if [[ $OS == "Darwin" ]]; then
     if ! [ "$(command -v jekyll -v)" ]; then
         gem update
         gem install bundler jekyll
+    fi
+
+    # Install rustup
+    if ! [ "$(command -v rustup)" ]; then
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
     fi
 else
     sudo apt-get update

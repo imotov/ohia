@@ -52,4 +52,9 @@ if [[ $OS == "Darwin" ]]; then
         export PATH=$PATH:"/Applications/IntelliJ IDEA CE.app/Contents/MacOS"
     fi
 
+    # Setup rustup
+    if [ -s "$HOME/.cargo/bin" ]; then
+        export PATH="$PATH:$HOME/.cargo/bin"
+    fi
+
 fi
