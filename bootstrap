@@ -37,7 +37,7 @@ if [[ $OS == "Darwin" ]]; then
         xz
     )
     brew update
-    brew list $MAC_PACKAGES > /dev/null || brew install $MAC_PACKAGES
+    brew list "${MAC_PACKAGES[@]}" > /dev/null || brew install "${MAC_PACKAGES[@]}"
 
     # Install ruby
     if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then

@@ -103,6 +103,10 @@ function posnd {
   pos --without=dev "$@"
 }
 
+function pymin {
+  mkdir "$1" && cd "$1" && pyenv virtualenv "$1" && pyenv local "$1" && pip install --upgrade pip
+}
+
 # ========= Misc commands ========= 
 
 function shuffle {
