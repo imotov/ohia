@@ -23,7 +23,6 @@ if [[ $OS == "Darwin" ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     MAC_PACKAGES=(
-        exiftool
         openjdk@17
         openjdk@21
         gradle

@@ -1,8 +1,8 @@
 # ========= Github specific settings ========= 
-alias ggff='git merge --ff-only origin/$(current_branch)'
+alias ggff='git merge --ff-only origin/$(git_current_branch)'
 alias ggfe='git fetch origin'
 
-alias giff='git merge --ff-only imotov/$(current_branch)'
+alias giff='git merge --ff-only imotov/$(git_current_branch)'
 alias gife='git fetch imotov'
 alias gipush='git push imotov "$(git_current_branch)"'
 
@@ -10,7 +10,7 @@ function gfe {
 	git fetch $1
 }
 function gff {
-	git merge --ff-only $1/$(current_branch)
+	git merge --ff-only $1/$(git_current_branch)
 }
 
 # fetch PR from remote 
