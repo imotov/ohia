@@ -19,43 +19,23 @@ if [[ $OS == "Darwin" ]]; then
     if ! [ "$(command -v brew)" ]; then
         echo "Checking sudo..."
         sudo echo "sudo have been acquired"
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+         NONINTERACTIVE=1 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     MAC_PACKAGES=(
-        chruby
-        exiftool
-        gh
-        go
+        openjdk@17
+        openjdk@21
         gradle
         jq
-        poetry
-        pyenv
-        pyenv-virtualenv
-        ruby-install
         tree
         xz
     )
     brew update
     brew list "${MAC_PACKAGES[@]}" > /dev/null || brew install "${MAC_PACKAGES[@]}"
 
-    # Install ruby
-    if [[ "$(ruby -e 'puts RUBY_VERSION')" != "3."* ]]; then
-        ruby-install --update ruby
-        source /opt/homebrew/share/chruby/chruby.sh
-        source /opt/homebrew/share/chruby/auto.sh
-        chruby | cut -c 4- > "$HOME/.ruby-version"
-    fi
-
-    # Install jekyll
-    if ! [ "$(command -v jekyll -v)" ]; then
-        gem update
-        gem install bundler jekyll
-    fi
-
     # Install rustup
     if ! [ "$(command -v rustup)" ]; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --no-modify-path
+        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     fi
 else
     sudo apt-get update
@@ -103,7 +83,6 @@ fi
 # Install oh-my-zsh
 if ! [ -d "$HOME/.oh-my-zsh" ]; then
     git clone -q https://github.com/ohmyzsh/ohmyzsh.git "$HOME/.oh-my-zsh"
-    cd "$HOME/.oh-my-zsh/plugins" && git clone -q https://github.com/zsh-users/zsh-syntax-highlighting.git
     cp "$OHIA_HOME/zshrc/zshrc" "$HOME/.zshrc"
 fi
 
