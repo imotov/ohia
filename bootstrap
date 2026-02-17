@@ -23,6 +23,7 @@ if [[ $OS == "Darwin" ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
     fi
     MAC_PACKAGES=(
+        exiftool
         openjdk@17
         openjdk@21
         gradle
@@ -31,7 +32,30 @@ if [[ $OS == "Darwin" ]]; then
         xz
     )
     brew update
-    brew list "${MAC_PACKAGES[@]}" > /dev/null || brew install "${MAC_PACKAGES[@]}"
+    MISSING_PACKAGES=()
+    for package in "${MAC_PACKAGES[@]}"; do
+        if ! brew list "$package" > /dev/null 2>&1; then
+            MISSING_PACKAGES+=("$package")
+        fi
+    done
+    if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
+        brew install "${MISSING_PACKAGES[@]}"
+    fi
+
+    # Setup java virtual machines for all Homebrew openjdk@* installations
+    for jdk_lib in /opt/homebrew/opt/openjdk@*/libexec/openjdk.jdk; do
+        # Skip if the glob didn't match anything
+        if [ ! -d "$jdk_lib" ]; then
+            continue
+        fi
+        pkg_dir="$(dirname "$(dirname "$jdk_lib")")"   # /opt/homebrew/opt/openjdk@17
+        pkg_name="$(basename "$pkg_dir")"                # e.g. openjdk@17
+        link_name="${pkg_name/@/-}"                       # convert to openjdk-17
+        target="/Library/Java/JavaVirtualMachines/${link_name}.jdk"
+        if ! [ -d "$target" ]; then
+            sudo ln -sfn "$jdk_lib" "$target"
+        fi
+    done
 
     # Install rustup
     if ! [ "$(command -v rustup)" ]; then
