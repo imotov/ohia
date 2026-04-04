@@ -62,29 +62,51 @@ if [[ $OS == "Darwin" ]]; then
         curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
     fi
 else
+    LINUX_PACKAGES=(
+        git
+        ca-certificates
+        curl
+        zsh
+    )
     sudo apt-get update
     sudo apt-get -y dist-upgrade
-    sudo apt-get install -y \
-        git \
-        ca-certificates \
-        curl \
-        zsh \
+    MISSING_PACKAGES=()
+    for package in "${LINUX_PACKAGES[@]}"; do
+        if ! dpkg-query -W -f='${Status}' "$package" 2>/dev/null | grep -q "install ok installed"; then
+            MISSING_PACKAGES+=("$package")
+        fi
+    done
+    if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
+        sudo apt-get install -y "${MISSING_PACKAGES[@]}"
+    fi
+
+    # Install SDKMAN
+    if ! [ -d "$HOME/.sdkman" ]; then
+        curl -s "https://get.sdkman.io" | bash
+    fi
 
     # Install docker
-    sudo install -m 0755 -d /etc/apt/keyrings
-    sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-    sudo chmod a+r /etc/apt/keyrings/docker.asc
-    echo \
-        "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
-        $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-    sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-    sudo apt-get update
-    sudo apt-get install -y \
-        docker-ce \
-        docker-ce-cli \
-        containerd.io \
-        docker-buildx-plugin \
-        docker-compose-plugin \
+    if ! [ "$(command -v docker)" ]; then
+        sudo install -m 0755 -d /etc/apt/keyrings
+        sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+        sudo chmod a+r /etc/apt/keyrings/docker.asc
+        echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+        sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        sudo apt-get update
+        sudo apt-get install -y \
+            docker-ce \
+            docker-ce-cli \
+            containerd.io \
+            docker-buildx-plugin \
+            docker-compose-plugin \
+
+        # Configure Docker
+        sudo usermod -aG docker $USER
+        sudo systemctl enable docker
+        sudo systemctl start docker
+    fi
 
 fi
 
