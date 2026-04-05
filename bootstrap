@@ -107,6 +107,12 @@ else
         sudo systemctl enable docker
         sudo systemctl start docker
     fi
+    if ! snap list | grep -q code; then
+        sudo snap install --classic code
+    fi
+    if ! snap list | grep -q intellij-idea-community; then
+        sudo snap install --classic intellij-idea-community
+    fi
 
 fi
 
