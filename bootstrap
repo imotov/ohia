@@ -24,9 +24,6 @@ if [[ $OS == "Darwin" ]]; then
     fi
     MAC_PACKAGES=(
         exiftool
-        openjdk@17
-        openjdk@21
-        gradle
         jq
         tree
         xz
@@ -42,25 +39,6 @@ if [[ $OS == "Darwin" ]]; then
         brew install "${MISSING_PACKAGES[@]}"
     fi
 
-    # Setup java virtual machines for all Homebrew openjdk@* installations
-    for jdk_lib in /opt/homebrew/opt/openjdk@*/libexec/openjdk.jdk; do
-        # Skip if the glob didn't match anything
-        if [ ! -d "$jdk_lib" ]; then
-            continue
-        fi
-        pkg_dir="$(dirname "$(dirname "$jdk_lib")")"   # /opt/homebrew/opt/openjdk@17
-        pkg_name="$(basename "$pkg_dir")"                # e.g. openjdk@17
-        link_name="${pkg_name/@/-}"                       # convert to openjdk-17
-        target="/Library/Java/JavaVirtualMachines/${link_name}.jdk"
-        if ! [ -d "$target" ]; then
-            sudo ln -sfn "$jdk_lib" "$target"
-        fi
-    done
-
-    # Install rustup
-    if ! [ "$(command -v rustup)" ]; then
-        curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
-    fi
 else
     LINUX_PACKAGES=(
         git
@@ -120,12 +98,12 @@ else
         sudo apt install -y google-chrome-stable
     fi
 
+    # Install nvm
+    if ! [ -s "$HOME/.nvm/nvm.sh" ]; then
+        curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
+    fi
 fi
 
-# Install nvm
-if ! [ -s "$HOME/.nvm/nvm.sh" ]; then
-    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
-fi
 
 # Download ohia files
 if ! [ -d "$OHIA_HOME" ]; then
