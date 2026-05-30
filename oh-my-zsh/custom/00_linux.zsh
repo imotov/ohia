@@ -23,4 +23,21 @@ if [[ $OS == "Linux" ]]; then
     [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
   fi
 
+  # Setup Conda
+  if [ -f "$HOME/miniconda3/etc/profile.d/conda.sh" ]; then
+    export PATH="$HOME/miniconda3/bin:$PATH"
+    source "$HOME/miniconda3/etc/profile.d/conda.sh"
+  fi
+
+  # Setup CMake (from ~/.local/bin if installed there)
+  if [ -f "$HOME/.local/bin/cmake" ]; then
+    export PATH="$HOME/.local/bin:$PATH"
+  fi
+
+  # Setup CUDA Toolkit
+  if [ -d "/usr/local/cuda" ]; then
+    export PATH="/usr/local/cuda/bin:$PATH"
+    export LD_LIBRARY_PATH="/usr/local/cuda/lib64:$LD_LIBRARY_PATH"
+  fi
+
 fi

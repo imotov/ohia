@@ -41,6 +41,7 @@ if [[ $OS == "Darwin" ]]; then
 
 else
     LINUX_PACKAGES=(
+        build-essential
         git
         ca-certificates
         curl
@@ -57,10 +58,34 @@ else
     if [ ${#MISSING_PACKAGES[@]} -gt 0 ]; then
         sudo apt-get install -y "${MISSING_PACKAGES[@]}"
     fi
-
     # Install SDKMAN
     if ! [ -d "$HOME/.sdkman" ]; then
         curl -s "https://get.sdkman.io" | bash
+    fi
+
+    # Install Conda and Mamba
+    MINICONDA_DIR="$HOME/miniconda3"
+    if [ ! -d "$MINICONDA_DIR" ]; then
+        echo "Conda not found, installing Miniconda..."
+        MINICONDA_INSTALLER="$HOME/tmp/miniconda.sh"
+        mkdir -p "$HOME/tmp"
+        curl -fsSL "https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh" -o "$MINICONDA_INSTALLER"
+        bash "$MINICONDA_INSTALLER" -b -p "$MINICONDA_DIR"
+        rm -f "$MINICONDA_INSTALLER"
+    fi
+
+    # Setup conda in PATH for current script
+    export PATH="$MINICONDA_DIR/bin:$PATH"
+
+    # Install Mamba only if not already present
+    if ! "$MINICONDA_DIR/bin/mamba" --version > /dev/null 2>&1; then
+        echo "Mamba not found, installing via conda..."
+        export CONDA_ALWAYS_YES=true
+        export CONDA_AUTO_ACTIVATE_BASE=false
+        # Accept conda TOS for default channels
+        "$MINICONDA_DIR/bin/conda" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main || true
+        "$MINICONDA_DIR/bin/conda" tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r || true
+        CONDA_SUBSHELL=true "$MINICONDA_DIR/bin/conda" install -n base -c conda-forge mamba
     fi
 
     # Install docker
@@ -102,6 +127,48 @@ else
     if ! [ -s "$HOME/.nvm/nvm.sh" ]; then
         curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.7/install.sh | bash
     fi
+
+    # Install CUDA Toolkit
+    if ! command -v nvcc > /dev/null 2>&1; then
+        echo "CUDA Toolkit not found, installing..."
+        CUDA_VERSION=12-2
+        CUDA_DISTRO="ubuntu$(. /etc/os-release && echo "${VERSION_ID//./}")"
+        CUDA_KEYRING=/etc/apt/keyrings/cuda-archive-keyring.gpg
+        CUDA_APT_LIST=/etc/apt/sources.list.d/cuda.list
+
+        sudo mkdir -p /etc/apt/keyrings
+        if [ ! -f "$CUDA_APT_LIST" ]; then
+            curl -fsSL "https://developer.download.nvidia.com/compute/cuda/repos/${CUDA_DISTRO}/x86_64/3bf863cc.pub" | sudo gpg --dearmor -o "$CUDA_KEYRING"
+            echo "deb [signed-by=$CUDA_KEYRING] https://developer.download.nvidia.com/compute/cuda/repos/${CUDA_DISTRO}/x86_64/ /" | sudo tee "$CUDA_APT_LIST" > /dev/null
+        fi
+        sudo apt-get update
+
+        CUDA_PACKAGES=(
+            "cuda-toolkit-${CUDA_VERSION}"
+            "cuda-${CUDA_VERSION}"
+            "cuda-toolkit"
+            "cuda"
+        )
+        for pkg in "${CUDA_PACKAGES[@]}"; do
+            if sudo apt-get install -y "$pkg"; then
+                break
+            fi
+        done
+    fi
+
+    # Install CMake 4.0 or higher
+    if ! command -v cmake > /dev/null 2>&1; then
+        echo "CMake not found, installing..."
+        ARCH=$(uname -m)
+        CMAKE_VERSION="4.3.3"
+        CMAKE_INSTALLER="$HOME/tmp/cmake-${CMAKE_VERSION}-linux-${ARCH}.sh"
+        mkdir -p "$HOME/tmp"
+        curl -fsSL "https://github.com/Kitware/CMake/releases/download/v${CMAKE_VERSION}/cmake-${CMAKE_VERSION}-linux-${ARCH}.sh" -o "$CMAKE_INSTALLER"
+        bash "$CMAKE_INSTALLER" --skip-license --prefix="$HOME/.local"
+        rm -f "$CMAKE_INSTALLER"
+        export PATH="$HOME/.local/bin:$PATH"
+    fi
+
 fi
 
 
